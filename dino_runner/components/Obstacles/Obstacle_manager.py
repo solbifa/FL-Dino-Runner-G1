@@ -1,5 +1,8 @@
+import random
 import pygame
+from dino_runner.components.Obstacles.Bird import Bird
 from dino_runner.components.Obstacles.cactus import Cactus
+from dino_runner.components.Obstacles.largecactus import Large_cactus
 
 
 class ObstacleManager:
@@ -8,8 +11,10 @@ class ObstacleManager:
         
     def update(self, game_speed, player, game):
         if not self.obstacles:
-            self.obstacles.append(Cactus())
-
+            obstacle_types = [Cactus(), Large_cactus(), Bird()]
+            obstacle = random.choice(obstacle_types)
+            self.obstacles.append(obstacle)
+           
         for obstacle in self.obstacles:
             obstacle.update(game_speed, self.obstacles)
             if player.rect.colliderect(obstacle.rect):
