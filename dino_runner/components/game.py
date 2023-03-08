@@ -79,18 +79,23 @@ class Game:
         half_screen_width = SCREEN_WIDTH // 2
         half_screen_height = SCREEN_HEIGHT // 2
         if not self.death_count:
-            font = pygame.font.Font(FONT_STYLE, 32)
-            text = font.render(
-                "Welcome, press any key to start!", True, (0, 0, 0))
-            text_rect = text.get_rect()
-            text_rect.center = (half_screen_width, half_screen_height)
-            self.screen.blit(text, text_rect)
+            self.print_message("Welcome, press any key to start!", half_screen_width, half_screen_height)
         else:
-            pass
+            self.print_message("Restarting game...", half_screen_width, half_screen_height)
+            self.print_message(f"Deaths: {self.death_count}", half_screen_width, half_screen_height + 50)
+            self.print_message(f"Score: {self.score.score}", half_screen_width, half_screen_height + 100)
+            
         self.screen.blit(DINO_START, (half_screen_width - 40, half_screen_height - 140))
         pygame.display.update()
         self.handle_menu_events()
-    
+
+    def print_message(self, message, width_position, height_position):
+        font = pygame.font.Font(FONT_STYLE, 32)
+        text = font.render(message, True, (0, 0, 0))
+        text_rect = text.get_rect()
+        text_rect.center = (width_position, height_position)
+        self.screen.blit(text, text_rect)
+
     def handle_menu_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
