@@ -1,9 +1,11 @@
 import pygame
 from dino_runner.components.Dinosaur import Dinosaur
 from dino_runner.components.Obstacles.Obstacle_manager import ObstacleManager
+from dino_runner.components.Obstacles.Power_Ups.power_up_manager import PowerUpManager
 from dino_runner.components.Obstacles.score import Score
 
-from dino_runner.utils.constants import BG, DINO_START, FONT_STYLE, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS
+from dino_runner.utils.constants import BG, DINO_START, FONT_STYLE, FONT_STYLE_CONSOLE, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, SHIELD_TYPE, TITLE, FPS
+from dino_runner.utils.message_util import print_message
 
 
 class Game:
@@ -23,6 +25,7 @@ class Game:
         self.obstacle_manager = ObstacleManager()
         self.score = Score()
         self.death_count = 0
+        self.power_up_manager = PowerUpManager()
 
     def run(self):
         self.executing = True
@@ -35,6 +38,7 @@ class Game:
         # Game loop: events - update - draw
         self.playing = True
         self.obstacle_manager.reset()
+        self.power_up_manager.reset()
         while self.playing:
             self.events()
             self.update()
@@ -50,6 +54,7 @@ class Game:
         self.player.update(user_input)
         self.obstacle_manager.update(self.game_speed, self.player, self.on_death)
         self.score.update(self)
+        self.power_up_manager.update(self.game_speed, self.score.score, self.player)
         
     def draw(self):
         self.clock.tick(FPS)
@@ -58,6 +63,8 @@ class Game:
         self.player.draw(self.screen)
         self.obstacle_manager.draw(self.screen)
         self.score.draw(self.screen)
+        self.power_up_manager.draw(self.screen)
+        self.player.check_power_up(self.screen)
         #pygame.display.update()
         pygame.display.flip()
         
@@ -71,30 +78,26 @@ class Game:
         self.x_pos_bg -= self.game_speed
 
     def on_death(self):
-        self.playing = False
-        self.death_count  += 1
+        is_invincible = self.player.type == SHIELD_TYPE
+        if not is_invincible:
+            pygame.time.delay(500)
+            self.playing = False
+            self.death_count  += 1
 
     def show_menu(self):
         self.screen.fill((255, 255, 255))
         half_screen_width = SCREEN_WIDTH // 2
         half_screen_height = SCREEN_HEIGHT // 2
         if not self.death_count:
-            self.print_message("Welcome, press any key to start!", half_screen_width, half_screen_height)
+            print_message("Welcome, press any key to start!", self.screen, half_screen_width, half_screen_height, FONT_STYLE_CONSOLE)
         else:
-            self.print_message("Restarting game...", half_screen_width, half_screen_height)
-            self.print_message(f"Deaths: {self.death_count}", half_screen_width, half_screen_height + 50)
-            self.print_message(f"Score: {self.score.score}", half_screen_width, half_screen_height + 100)
+            print_message("Restarting game...", self.screen, half_screen_width, half_screen_height, font_color=(0, 255, 0))
+            print_message(f"Deaths: {self.death_count}", self.screen, half_screen_width, half_screen_height + 50)
+            print_message(f"Score: {self.score.score}", self.screen, half_screen_width, half_screen_height + 100)
             
         self.screen.blit(DINO_START, (half_screen_width - 40, half_screen_height - 140))
         pygame.display.update()
         self.handle_menu_events()
-
-    def print_message(self, message, width_position, height_position):
-        font = pygame.font.Font(FONT_STYLE, 32)
-        text = font.render(message, True, (0, 0, 0))
-        text_rect = text.get_rect()
-        text_rect.center = (width_position, height_position)
-        self.screen.blit(text, text_rect)
 
     def handle_menu_events(self):
         for event in pygame.event.get():
@@ -103,5 +106,6 @@ class Game:
                 self.executing = False
 
             elif event.type == pygame.KEYDOWN:
+                self.score.reset()
                 self.start_game()
 
