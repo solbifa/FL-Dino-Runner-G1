@@ -4,7 +4,7 @@ import random
 import pygame
 from dino_runner.components.Obstacles.Power_Ups.power_up import PowerUp
 
-from dino_runner.components.Obstacles.Power_Ups.shield import Shield
+from dino_runner.components.Obstacles.Power_Ups.shield import Hammer, Heart, Shield
 
 
 class PowerUpManager:
@@ -14,7 +14,8 @@ class PowerUpManager:
     def update(self, game_speed, score, player):
         if not self.power_ups and score == self.when_appears:
             self.when_appears += random.randint(300, 400)
-            self.power_ups.append(Shield())
+            power_up_type = random.choice([Hammer, Shield, Heart]) # Choose randomly between the 3 power-ups
+            self.power_ups.append(power_up_type())
 
         for power_up in self.power_ups:
             power_up.update(game_speed, self.power_ups)

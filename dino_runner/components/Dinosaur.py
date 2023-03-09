@@ -1,16 +1,17 @@
 import pygame
 from pygame.sprite import Sprite
 
-from dino_runner.utils.constants import DEFAULT_TYPE, DUCKING, DUCKING_SHIELD, JUMPING, JUMPING_SHIELD, RUNNING, RUNNING_SHIELD, SCREEN_WIDTH, SHIELD_TYPE
+from dino_runner.utils.constants import DEFAULT_TYPE, DUCKING, DUCKING_HAMMER, DUCKING_SHIELD, HAMMER_TYPE, HEART_TYPE, \
+    JUMPING, JUMPING_HAMMER, JUMPING_SHIELD, RUNNING, RUNNING_HAMMER, RUNNING_SHIELD, SCREEN_WIDTH, SHIELD_TYPE
 from dino_runner.utils.message_util import print_message
 
 DINO_RUNNING = "running"
 DINO_JUMPING = "jumping"
 DINO_DUCKING = "ducking"
 
-DUCK_IMG ={ DEFAULT_TYPE: DUCKING, SHIELD_TYPE: DUCKING_SHIELD }
-JUMP_IMG ={ DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD }
-RUN_IMG ={ DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD }
+DUCK_IMG ={ DEFAULT_TYPE: DUCKING, SHIELD_TYPE: DUCKING_SHIELD, HAMMER_TYPE: DUCKING_HAMMER, HEART_TYPE: DUCKING}
+JUMP_IMG ={ DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD, HAMMER_TYPE: JUMPING_HAMMER, HEART_TYPE: JUMPING}
+RUN_IMG ={ DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD, HAMMER_TYPE: RUNNING_HAMMER, HEART_TYPE: RUNNING}
 
 class Dinosaur(Sprite):
     POSITION_X = 80
@@ -29,6 +30,7 @@ class Dinosaur(Sprite):
         self.action = DINO_RUNNING
         self.jump_velocity = self.JUMP_VELOCITY
         self.step = 0
+        self.lives = 3
 
     def update(self, user_input):
         if self.action == DINO_RUNNING:
@@ -76,19 +78,29 @@ class Dinosaur(Sprite):
         self.step += 1
 
     def draw(self, screen):
+        print_message(f"Lives: {self.lives}", screen, 950, 55, font_size=24)
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
     def on_pick_power_up(self, power_up):
         self.type = power_up.type
         self.power_up_time_up = power_up.start_time + \
             (power_up.duration * 1000)
+        if self.type == HEART_TYPE:
+            self.lives += 1
 
     def check_power_up(self, screen):
-        if self.type == SHIELD_TYPE:
-            time_to_show = round((self.power_up_time_up - pygame.time.get_ticks()) / 1000, 2)
-            if time_to_show >= 0:
-                half_screen_width = SCREEN_WIDTH // 2
+        time_to_show = round((self.power_up_time_up - pygame.time.get_ticks()) / 1000, 2)
+        if time_to_show >= 0:
+            half_screen_width = SCREEN_WIDTH // 2
+            if self.type == SHIELD_TYPE:
                 print_message(f"{self.type.capitalize()}enabled for {time_to_show} seconds.", screen, half_screen_width, 50, font_size=16)
+            elif self.type == HAMMER_TYPE:
+                print_message(f"{self.type.capitalize()} enabled for {time_to_show} seconds. Hit cacti to earn extra points!", 
+                        screen, half_screen_width, 50, font_size=16)
+            elif self.type == HEART_TYPE:
+                print_message("You win an extra live.", screen, half_screen_width, 50, font_size=16)
             else:
-                self.type = DEFAULT_TYPE
-                self.power_up_time_up = 0
+                print_message("Unknown power-up!", screen, half_screen_width, 50, font_size=16)
+        else:
+            self.type = DEFAULT_TYPE
+            self.power_up_time_up = 0

@@ -22,7 +22,7 @@ RUNNING_SHIELD = [
 ]
 
 RUNNING_HAMMER = [
-    pygame.image.load(os.path.join(IMG_DIR, "Dino/DinoDuck1Hammer.png")),
+    pygame.image.load(os.path.join(IMG_DIR, "Dino/DinoRun1Hammer.png")),
     pygame.image.load(os.path.join(IMG_DIR, "Dino/DinoRun2.png")),
 ]
 
@@ -66,12 +66,15 @@ SHIELD = pygame.image.load(os.path.join(IMG_DIR, 'Other/shield.png'))
 HAMMER = pygame.image.load(os.path.join(IMG_DIR, 'Other/hammer.png'))
 
 DINO_START =pygame.image.load(os.path.join(IMG_DIR, "Dino/DinoStart.png"))
+GAME_OVER =pygame.image.load(os.path.join(IMG_DIR, "Other/GameOver.png"))
 BG = pygame.image.load(os.path.join(IMG_DIR, 'Other/Track.png'))
 
 HEART = pygame.image.load(os.path.join(IMG_DIR, 'Other/SmallHeart.png'))
 
 DEFAULT_TYPE = "default"
 SHIELD_TYPE = "shield"
+HEART_TYPE = "life"
+HAMMER_TYPE = "enhance"
 
 FONT_STYLE = "freesansbold.ttf"
 FONT_STYLE_CONSOLE = os.path.join(IMG_DIR, 'Other/PressStart2P-Regular.ttf')

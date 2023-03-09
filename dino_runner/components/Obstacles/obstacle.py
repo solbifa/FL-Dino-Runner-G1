@@ -10,9 +10,12 @@ class Obstacle(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = SCREEN_WIDTH
 
-    def update(self, game_speed, obstacles):
+    def update(self, game_speed, obstacles, player_x_position = 0):
+        limit = -self.rect.width
+        if player_x_position != 0:
+            limit = player_x_position
         self.rect.x -= game_speed
-        if self.rect.x < -self.rect.width:
+        if self.rect.x < limit:
             obstacles.remove(self)
 
     def draw(self, screen):

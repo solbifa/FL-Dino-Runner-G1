@@ -1,8 +1,7 @@
 import random
-import pygame
 from dino_runner.components.Obstacles.Bird import Bird
 from dino_runner.components.Obstacles.cactus import Cactus
-from dino_runner.components.Obstacles.cactus import LargeCactus
+from dino_runner.utils.constants import HAMMER_TYPE
 
 
 class ObstacleManager:
@@ -11,14 +10,16 @@ class ObstacleManager:
         
     def update(self, game_speed, player, on_death):
         if not self.obstacles:
-            obstacle_types = [Cactus(), LargeCactus(), Bird()]
+            obstacle_types = [Cactus(), Bird()]
             obstacle = random.choice(obstacle_types)
             self.obstacles.append(obstacle)
            
         for obstacle in self.obstacles:
-            obstacle.update(game_speed, self.obstacles)
-            if player.rect.colliderect(obstacle.rect):
-                pygame.time.delay(500)
+            if player.type == HAMMER_TYPE:
+                 obstacle.update(game_speed, self.obstacles, player.rect.x)
+            else:
+                obstacle.update(game_speed, self.obstacles)
+            if obstacle.rect.colliderect(player.rect):
                 on_death()
 
     def draw(self, screen):
@@ -27,3 +28,4 @@ class ObstacleManager:
 
     def reset(self):
         self.obstacles = []
+        self.cactus_points = 0
